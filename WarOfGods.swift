@@ -1,11 +1,11 @@
 // The class which runs all different types of characters in the game
 class Character {
-    var name: String
+    let name: String
     var life: Int
-    var attack: Int
-    var heal: Int
+    let attack: Int
+    let heal: Int
     var weapon: Weapon?
-    var element: Element
+    let element: Element
     
     init(name: String, life: Int, attack: Int, heal: Int, element: Element) {
         self.name = name
@@ -28,7 +28,7 @@ class Character {
 class Warrior: Character {
     
     init(name: String, element: Element) {
-        super.init(name: name, life: 100, attack: 10, heal: 0, element: element)
+        super.init(name: name, life: 10, attack: 10, heal: 0, element: element)
     }
 }
 
@@ -36,7 +36,7 @@ class Warrior: Character {
 class Wizard: Character {
     
     init(name: String, element: Element) {
-        super.init(name: name, life: 75, attack: 0, heal: 10, element: element)
+        super.init(name: name, life: 10, attack: 0, heal: 10, element: element)
     }
 }
 
@@ -44,7 +44,7 @@ class Wizard: Character {
 class Giant: Character {
     
     init(name: String, element: Element) {
-        super.init(name: name, life: 200, attack: 5, heal: 0, element: element)
+        super.init(name: name, life: 15, attack: 5, heal: 0, element: element)
     }
 }
 
@@ -52,15 +52,15 @@ class Giant: Character {
 class Dwarf: Character {
     
     init(name: String, element: Element) {
-        super.init(name: name, life: 50, attack: 20, heal: 0, element: element)
+        super.init(name: name, life: 5, attack: 20, heal: 0, element: element)
     }
 }
 
 // The class which runs all different types of weapons in the game
 class Weapon {
-    var attack: Int
-    var heal: Int
-    var name: String
+    let attack: Int
+    let heal: Int
+    let name: String
     
     init(name: String, attack: Int, heal: Int) {
         self.attack = attack
@@ -133,13 +133,13 @@ enum Element {
 
 // The class which stores all the weapons in a chest
 class Chest {
-    var toothbrush: AttackingWeapon
-    var sword: AttackingWeapon
-    var axe: AttackingWeapon
-    var toothpick: HealingWeapon
-    var staff: HealingWeapon
-    var orb: HealingWeapon
-    var weapons: [Weapon]
+    let toothbrush: AttackingWeapon
+    let sword: AttackingWeapon
+    let axe: AttackingWeapon
+    let toothpick: HealingWeapon
+    let staff: HealingWeapon
+    let orb: HealingWeapon
+    let weapons: [Weapon]
     
     init() {
         self.toothbrush = AttackingWeapon(name: "une brosse à dent", attack: 1)
@@ -153,16 +153,18 @@ class Chest {
     }
     
     // Picks a random weapon
-    func pickWeapon() -> Weapon {
-        let weapon = weapons.randomElement()
-        print("Le coffre contient \(weapon!.name)")
-        return weapon!
+    func pickWeapon() -> Weapon? {
+        let weapon: Weapon? = weapons.randomElement()
+        if weapon != nil {
+            print("Le coffre contient \(weapon!.name)")
+        }
+        return weapon
     }
 }
 
 // The class with all the informations and functions about the player and his team of characters
 class Player {
-    var name: String
+    let name: String
     var characters: [Character]
     static var characterNames = [String]()
     
@@ -184,57 +186,69 @@ class Player {
                 + "\n4. Nain")
             if let choice = readLine() {
                 var character: Character
-                var characterName = String()
+                var characterName: String?
                 var characterElement = Element.fire
                 switch choice {
                 case "1" :
                     print("\nQuel est le nom du Guerrier ?")
                     characterName = readUniqueName()
-                    characterElement = chooseElement()
-                    character = Warrior(name: characterName, element: characterElement)
-                    characters.append(character)
+                    if characterName != nil {
+                        characterElement = chooseElement()
+                        character = Warrior(name: characterName!, element: characterElement)
+                        characters.append(character)
+                    }
                 case "2" :
                     print("\nQuel est le nom du Magicien ?")
                     characterName = readUniqueName()
-                    characterElement = chooseElement()
-                    character = Wizard(name: characterName, element: characterElement)
-                    characters.append(character)
+                    if characterName != nil {
+                        characterElement = chooseElement()
+                        character = Wizard(name: characterName!, element: characterElement)
+                        characters.append(character)
+                    }
                 case "3" :
                     print("\nQuel est le nom du Géant ?")
                     characterName = readUniqueName()
-                    characterElement = chooseElement()
-                    character = Giant(name: characterName, element: characterElement)
-                    characters.append(character)
+                    if characterName != nil {
+                        characterElement = chooseElement()
+                        character = Giant(name: characterName!, element: characterElement)
+                        characters.append(character)
+                    }
                 case "4" :
                     print("\nQuel est le nom du Nain ?")
                     characterName = readUniqueName()
-                    characterElement = chooseElement()
-                    character = Dwarf(name: characterName, element: characterElement)
-                    characters.append(character)
+                    if characterName != nil {
+                        characterElement = chooseElement()
+                        character = Dwarf(name: characterName!, element: characterElement)
+                        characters.append(character)
+                    }
                 default :
                     print("Pouvez-vous répéter ?")
                     makeTeam()
                 }
-                Player.characterNames.append(characterName)
+                if characterName != nil {
+                    Player.characterNames.append(characterName!)
+                }
             }
         }
     }
     
     // Checks the uniqueness of the given name
-    func readUniqueName() -> String {
+    func readUniqueName() -> String? {
         let uniqueName: String? = readLine()
         if uniqueName != nil {
-            for aName in Player.characterNames {
-                if uniqueName == aName {
-                    print("Ce nom existe déjà. Veuillez en donner un autre.")
-                    return readUniqueName()
-                } else if uniqueName == "" {
-                    print("Ce nom n'est pas valable. Veuillez en donner un autre.")
-                    return readUniqueName()
+            if uniqueName! == "" {
+                print("Ce nom n'est pas valable. Veuillez en donner un autre.")
+                return readUniqueName()
+            } else {
+                for aName in Player.characterNames {
+                    if uniqueName! == aName {
+                        print("Ce nom existe déjà. Veuillez en donner un autre.")
+                        return readUniqueName()
+                    }
                 }
             }
         }
-        return uniqueName!
+        return uniqueName
     }
     
     // Picks an element
@@ -304,15 +318,16 @@ class Player {
     }
 }
 
-// La classe Jeu régissant la partie, la création des joueurs, leur nomination et le combat avec l'apparition aléatoire d'un coffre
+// The class which runs the game with the players, the appearance of the chest and the fight
 class Game {
     var players: [Player]
     
     init() {
         self.players = []
         print("Bonjour et bienvenu dans War Of Gods !")
-        addPlayer()
-        addPlayer()
+        while players.count < 2 {
+            addPlayer()
+        }
         fight()
     }
     
@@ -332,7 +347,7 @@ class Game {
         var character1: Character
         var character2: Character
         var chest: Chest?
-        var weapon: Weapon
+        var weapon: Weapon?
         var i: Int = 0
         print("\nLe combat va débuter."
             + "\n\(players[i].name) veuillez commencer.")
@@ -341,14 +356,16 @@ class Game {
             chest = makeChestAppear()
             if chest != nil {
                 weapon = chest!.pickWeapon()
-                if type(of: weapon) == HealingWeapon.self && type(of: character1) == Wizard.self {
-                    character1.weapon = weapon
-                    print("\n\(character1.name) s'équipe de l'arme."
-                        + "\nSon pouvoir de soigner s'élève maintenant à \(character1.realHeal) points de vie.")
-                } else if type(of: weapon) == AttackingWeapon.self && type(of: character1) != Wizard.self {
-                    character1.weapon = weapon
-                    print("\n\(character1.name) s'équipe de l'arme."
-                        + "\nSon attaque s'élève maintenant à \(character1.realAttack) points d'attaque.")
+                if weapon != nil {
+                    if type(of: weapon!) == HealingWeapon.self && type(of: character1) == Wizard.self {
+                        character1.weapon = weapon!
+                        print("\n\(character1.name) s'équipe de l'arme."
+                            + "\nSon pouvoir de soigner s'élève maintenant à \(character1.realHeal) points de vie.")
+                    } else if type(of: weapon!) == AttackingWeapon.self && type(of: character1) != Wizard.self {
+                        character1.weapon = weapon!
+                        print("\n\(character1.name) s'équipe de l'arme."
+                            + "\nSon attaque s'élève maintenant à \(character1.realAttack) points d'attaque.")
+                    }
                 }
             }
             if type(of: character1) == Wizard.self {
@@ -362,11 +379,11 @@ class Game {
                 character2 = players[(i + 1) % 2].pickCharacter()
                 let damage = Int(Double(character1.realAttack) * character1.element.coefficientToApplyOnAttack(character2.element))
                 character2.life -= damage
-                print("\(character2.name) a perdu \(damage) points de vie, il lui en reste \(character2.life).")
-                
                 if character2.life < 0 {
                     character2.life = 0
                     print("\(character2.name) est mort !")
+                } else {
+                    print("\(character2.name) a perdu \(damage) points de vie, il lui en reste \(character2.life).")
                 }
             }
             i += 1
